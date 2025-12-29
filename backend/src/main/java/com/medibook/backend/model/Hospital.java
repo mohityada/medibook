@@ -10,6 +10,10 @@ public class Hospital {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
+
     @Column(nullable = false)
     private String name;
 
@@ -20,8 +24,9 @@ public class Hospital {
     public Hospital() {
     }
 
-    public Hospital(Long id, String name, String address, String city, String contact) {
+    public Hospital(Long id, User user, String name, String address, String city, String contact) {
         this.id = id;
+        this.user = user;
         this.name = name;
         this.address = address;
         this.city = city;
@@ -30,19 +35,21 @@ public class Hospital {
 
     public static class HospitalBuilder {
         private Long id;
+        private User user;
         private String name;
         private String address;
         private String city;
         private String contact;
 
         public HospitalBuilder id(Long id) { this.id = id; return this; }
+        public HospitalBuilder user(User user) { this.user = user; return this; }
         public HospitalBuilder name(String name) { this.name = name; return this; }
         public HospitalBuilder address(String address) { this.address = address; return this; }
         public HospitalBuilder city(String city) { this.city = city; return this; }
         public HospitalBuilder contact(String contact) { this.contact = contact; return this; }
 
         public Hospital build() {
-            return new Hospital(id, name, address, city, contact);
+            return new Hospital(id, user, name, address, city, contact);
         }
     }
 
@@ -52,6 +59,9 @@ public class Hospital {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

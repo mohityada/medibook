@@ -66,44 +66,99 @@ public class AuthController {
     @Autowired
     com.medibook.backend.repository.DoctorRepository doctorRepository;
 
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+    @Autowired
+    com.medibook.backend.repository.HospitalRepository hospitalRepository;
+
+    @PostMapping("/signup/patient")
+    public ResponseEntity<?> registerPatient(@Valid @RequestBody com.medibook.backend.payload.request.PatientSignupRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
         }
 
-        // Create new user's account
         User user = User.builder()
+                .firstName(signUpRequest.getFirstName())
+                .lastName(signUpRequest.getLastName())
                 .email(signUpRequest.getEmail())
                 .password(encoder.encode(signUpRequest.getPassword()))
                 .mobileNumber(signUpRequest.getMobileNumber())
-                .role(Role.PATIENT) // Default role
+                .role(Role.PATIENT)
                 .build();
-
-        Set<String> strRoles = signUpRequest.getRole();
-        if (strRoles != null && strRoles.contains("doctor")) {
-            user.setRole(Role.DOCTOR);
-        } else if (strRoles != null && strRoles.contains("admin")) {
-            user.setRole(Role.ADMIN);
-        }
 
         User savedUser = userRepository.save(user);
 
-        // Create profile based on role
-        if (user.getRole() == Role.DOCTOR) {
-            com.medibook.backend.model.Doctor doctor = com.medibook.backend.model.Doctor.builder()
-                    .user(savedUser)
-                    .build();
-            doctorRepository.save(doctor);
-        } else if (user.getRole() == Role.PATIENT) {
-            com.medibook.backend.model.Patient patient = com.medibook.backend.model.Patient.builder()
-                    .user(savedUser)
-                    .build();
-            patientRepository.save(patient);
+        java.time.LocalDate dob = null;
+        if (signUpRequest.getDateOfBirth() != null && !signUpRequest.getDateOfBirth().isEmpty()) {
+            dob = java.time.LocalDate.parse(signUpRequest.getDateOfBirth());
         }
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        com.medibook.backend.model.Patient patient = com.medibook.backend.model.Patient.builder()
+                .user(savedUser)
+                .dateOfBirth(dob)
+                .bloodGroup(signUpRequest.getBloodGroup())
+                .gender(signUpRequest.getGender())
+                .allergies(signUpRequest.getAllergies())
+                .build();
+        patientRepository.save(patient);
+
+        return ResponseEntity.ok(new MessageResponse("Patient registered successfully!"));
+    }
+
+    @PostMapping("/signup/doctor")
+    public ResponseEntity<?> registerDoctor(@Valid @RequestBody com.medibook.backend.payload.request.DoctorSignupRequest signUpRequest) {
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+        }
+
+        User user = User.builder()
+                .firstName(signUpRequest.getFirstName())
+                .lastName(signUpRequest.getLastName())
+                .email(signUpRequest.getEmail())
+                .password(encoder.encode(signUpRequest.getPassword()))
+                .mobileNumber(signUpRequest.getMobileNumber())
+                .role(Role.DOCTOR)
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        com.medibook.backend.model.Doctor doctor = com.medibook.backend.model.Doctor.builder()
+                .user(savedUser)
+                .speciality(signUpRequest.getSpeciality())
+                .degree(signUpRequest.getDegree())
+                .experience(signUpRequest.getExperience())
+                .fees(signUpRequest.getFees())
+                .isFreelance(signUpRequest.getIsFreelance())
+                .build();
+        doctorRepository.save(doctor);
+
+        return ResponseEntity.ok(new MessageResponse("Doctor registered successfully!"));
+    }
+
+    @PostMapping("/signup/hospital")
+    public ResponseEntity<?> registerHospital(@Valid @RequestBody com.medibook.backend.payload.request.HospitalSignupRequest signUpRequest) {
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+        }
+
+        User user = User.builder()
+                .firstName(signUpRequest.getFirstName())
+                .lastName(signUpRequest.getLastName())
+                .email(signUpRequest.getEmail())
+                .password(encoder.encode(signUpRequest.getPassword()))
+                .mobileNumber(signUpRequest.getMobileNumber())
+                .role(Role.HOSPITAL)
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        com.medibook.backend.model.Hospital hospital = com.medibook.backend.model.Hospital.builder()
+                .user(savedUser)
+                .name(signUpRequest.getHospitalName())
+                .address(signUpRequest.getHospitalAddress())
+                .city(signUpRequest.getHospitalCity())
+                .contact(signUpRequest.getHospitalContact())
+                .build();
+        hospitalRepository.save(hospital);
+
+        return ResponseEntity.ok(new MessageResponse("Hospital registered successfully!"));
     }
 }
