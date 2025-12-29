@@ -60,6 +60,12 @@ public class AuthController {
                 roles));
     }
 
+    @Autowired
+    com.medibook.backend.repository.PatientRepository patientRepository;
+
+    @Autowired
+    com.medibook.backend.repository.DoctorRepository doctorRepository;
+
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
@@ -83,7 +89,20 @@ public class AuthController {
             user.setRole(Role.ADMIN);
         }
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        // Create profile based on role
+        if (user.getRole() == Role.DOCTOR) {
+            com.medibook.backend.model.Doctor doctor = com.medibook.backend.model.Doctor.builder()
+                    .user(savedUser)
+                    .build();
+            doctorRepository.save(doctor);
+        } else if (user.getRole() == Role.PATIENT) {
+            com.medibook.backend.model.Patient patient = com.medibook.backend.model.Patient.builder()
+                    .user(savedUser)
+                    .build();
+            patientRepository.save(patient);
+        }
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
