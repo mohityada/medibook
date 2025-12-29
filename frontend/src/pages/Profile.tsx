@@ -16,6 +16,7 @@ interface ProfileData {
 const Profile = () => {
     const { user } = useAuth();
     const [profile, setProfile] = useState<ProfileData | null>(null);
+    const [appointments, setAppointments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -30,8 +31,18 @@ const Profile = () => {
             }
         };
 
+        const fetchAppointments = async () => {
+            try {
+                const response = await api.get('/appointments/my-appointments');
+                setAppointments(response.data);
+            } catch (error) {
+                console.error("Failed to fetch appointments", error);
+            }
+        };
+
         if (user) {
             fetchProfile();
+            if (user) fetchAppointments();
         }
     }, [user]);
 
@@ -167,6 +178,33 @@ const Profile = () => {
             {/* Role Specific Details */}
             {renderDetails()}
 
+            {/* Appointment History */}
+            {profile.role === 'PATIENT' && (
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mt-6">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-800 flex items-center">
+                        <Calendar className="w-5 h-5 mr-2 text-blue-500" /> Appointment History
+                    </h3>
+
+                    {appointments.length === 0 ? (
+                        <p className="text-gray-500">No appointments found.</p>
+                    ) : (
+                        <div className="space-y-4">
+                            {appointments.map((apt: any) => (
+                                <div key={apt.id} className="flex flex-col sm:flex-row justify-between items-center border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                                    <div>
+                                        <p className="font-medium text-gray-900">Dr. {apt.doctor?.user?.firstName} {apt.doctor?.user?.lastName}</p>
+                                        <p className="text-sm text-gray-500">{new Date(apt.timeSlot).toLocaleString()}</p>
+                                    </div>
+                                    <span className={`px-2 py-1 rounded text-xs font-medium ${apt.status === 'CONFIRMED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                        }`}>
+                                        {apt.status}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
