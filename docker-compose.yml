@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: medibook-db
+    environment:
+      POSTGRES_DB: medibook
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - medibook-network
+
+  backend:
+    build: ./backend
+    container_name: medibook-backend
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/medibook
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      # Generate a random key for production
+      APPLICATION_SECURITY_JWT_SECRET_KEY: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    ports:
+      - "8080:8080"
+    networks:
+      - medibook-network
+
+  frontend:
+    build: ./frontend
+    container_name: medibook-frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - medibook-network
+
+networks:
+  medibook-network:
+    driver: bridge
+
+volumes:
+  db_data:
