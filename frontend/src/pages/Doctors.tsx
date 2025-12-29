@@ -49,7 +49,7 @@ const Doctors = () => {
     }, [query]);
 
     const generateSlots = () => {
-        const slots = [];
+        const slots: Date[] = [];
         const today = new Date();
         for (let i = 1; i <= 3; i++) {
             const date = new Date(today);
