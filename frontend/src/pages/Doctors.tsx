@@ -8,6 +8,8 @@ interface Doctor {
     id: number;
     user: {
         email: string;
+        firstName: string;
+        lastName: string;
         mobileNumber?: string;
     };
     speciality: string;
@@ -81,7 +83,7 @@ const Doctors = () => {
                         <div className="p-6">
                             <div className="flex justify-between items-start mb-4">
                                 <div>
-                                    <h2 className="text-xl font-bold text-gray-900">Dr. {doctor.user.email.split('@')[0]}</h2>
+                                    <h2 className="text-xl font-bold text-gray-900">Dr. {doctor.user.firstName} {doctor.user.lastName}</h2>
                                     <p className="text-blue-600 font-medium">{doctor.speciality}</p>
                                 </div>
                                 <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
