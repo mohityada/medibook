@@ -15,7 +15,7 @@ services:
     networks:
       - medibook-network
 
-  backend:
+  medibook-backend:
     build: ./backend
     container_name: medibook-backend
     depends_on:
@@ -35,7 +35,7 @@ services:
     build: ./frontend
     container_name: medibook-frontend
     depends_on:
-      - backend
+      - medibook-backend
     ports:
       - "80:80"
     networks:
