@@ -29,7 +29,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return path.startsWith("/api/auth/") || path.startsWith("/auth/");
+        return path.startsWith("/api/auth/") || path.startsWith("/auth/") || path.equals("/") || path.equals("/error");
     }
 
     @Override
