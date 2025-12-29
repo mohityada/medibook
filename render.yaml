@@ -1,0 +1,45 @@
+databases:
+  - name: medibook-db
+    plan: free
+    databaseName: medibook
+    user: medibook
+
+services:
+  # Backend Service (Docker)
+  - type: web
+    name: medibook-backend
+    runtime: docker
+    rootDir: backend
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: medibook-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: medibook-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: medibook-db
+          property: password
+      - key: APPLICATION_SECURITY_JWT_SECRET_KEY
+        generateValue: true
+
+  # Frontend Service (Static Site)
+  - type: web
+    name: medibook-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: "/*"
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: medibook-backend
+          property: url
