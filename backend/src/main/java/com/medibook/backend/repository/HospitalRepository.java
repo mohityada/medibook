@@ -10,4 +10,5 @@ import java.util.List;
 public interface HospitalRepository extends JpaRepository<Hospital, Long> {
     List<Hospital> findByCityContainingIgnoreCase(String city);
     List<Hospital> findByNameContainingIgnoreCase(String name);
+    java.util.Optional<Hospital> findByUser_Id(Long userId);
 }

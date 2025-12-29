@@ -10,5 +10,6 @@ import java.util.List;
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     List<Doctor> findBySpecialityContainingIgnoreCase(String speciality);
     List<Doctor> findByHospital_CityContainingIgnoreCase(String city);
+    java.util.Optional<Doctor> findByUser_Id(Long userId);
     // Complex queries will be handled by Specification or custom query
 }

@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Doctors from './pages/Doctors';
 import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/doctors" element={<Doctors />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         </main>
         <footer className="bg-white border-t border-gray-200 py-8 text-center text-gray-500">

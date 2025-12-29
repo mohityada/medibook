@@ -7,7 +7,7 @@ interface Appointment {
     id: number;
     doctor: {
         speciality: string;
-        user: { email: string };
+        user: { email: string; firstName: string; lastName: string };
         hospital?: { name: string; city: string };
     };
     timeSlot: string;
@@ -71,7 +71,7 @@ const Dashboard = () => {
                                             <Calendar className="h-6 w-6 text-blue-600" />
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold text-gray-900">Dr. {apt.doctor.user.email.split('@')[0]}</h3>
+                                            <h3 className="font-semibold text-gray-900">Dr. {apt.doctor.user.firstName} {apt.doctor.user.lastName}</h3>
                                             <p className="text-sm text-gray-600">{apt.doctor.speciality} • {apt.doctor.hospital?.name || 'Freelance'}</p>
                                             <div className="flex items-center text-sm text-gray-500 mt-1">
                                                 <Clock className="h-3 w-3 mr-1" />
