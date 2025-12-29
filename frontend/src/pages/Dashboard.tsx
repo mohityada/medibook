@@ -10,6 +10,12 @@ interface Appointment {
         user: { email: string; firstName: string; lastName: string };
         hospital?: { name: string; city: string };
     };
+    patient: {
+        user: { email: string; firstName: string; lastName: string };
+        gender: string;
+        bloodGroup: string;
+        dateOfBirth: string;
+    };
     timeSlot: string;
     status: string;
     paymentStatus: string;
@@ -51,13 +57,17 @@ const Dashboard = () => {
     if (!user) return <div className="p-10">Please login</div>;
     if (loading) return <div className="p-10">Loading dashboard...</div>;
 
+    const isDoctor = user.roles.includes('ROLE_DOCTOR');
+
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
             <h1 className="text-3xl font-bold mb-8">My Dashboard</h1>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                    <h2 className="text-lg font-semibold text-gray-900">Upcoming Appointments</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                        {isDoctor ? 'Scheduled Appointments' : 'Upcoming Appointments'}
+                    </h2>
                 </div>
                 <div className="p-6">
                     {appointments.length === 0 ? (
@@ -71,8 +81,19 @@ const Dashboard = () => {
                                             <Calendar className="h-6 w-6 text-blue-600" />
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold text-gray-900">Dr. {apt.doctor.user.firstName} {apt.doctor.user.lastName}</h3>
-                                            <p className="text-sm text-gray-600">{apt.doctor.speciality} • {apt.doctor.hospital?.name || 'Freelance'}</p>
+                                            {isDoctor ? (
+                                                <>
+                                                    <h3 className="font-semibold text-gray-900">Patient: {apt.patient.user.firstName} {apt.patient.user.lastName}</h3>
+                                                    <p className="text-sm text-gray-600">
+                                                        {apt.patient.gender}, {apt.patient.bloodGroup} • Age: {new Date().getFullYear() - new Date(apt.patient.dateOfBirth).getFullYear()}
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <h3 className="font-semibold text-gray-900">Dr. {apt.doctor.user.firstName} {apt.doctor.user.lastName}</h3>
+                                                    <p className="text-sm text-gray-600">{apt.doctor.speciality} • {apt.doctor.hospital?.name || 'Freelance'}</p>
+                                                </>
+                                            )}
                                             <div className="flex items-center text-sm text-gray-500 mt-1">
                                                 <Clock className="h-3 w-3 mr-1" />
                                                 <span>{new Date(apt.timeSlot).toLocaleString()}</span>
@@ -86,18 +107,20 @@ const Dashboard = () => {
                                             {apt.status}
                                         </span>
 
-                                        {apt.paymentStatus === 'PENDING' ? (
-                                            <button
-                                                onClick={() => handlePay(apt.id)}
-                                                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
-                                            >
-                                                <CreditCard className="h-4 w-4 mr-2" />
-                                                Pay Now
-                                            </button>
-                                        ) : (
-                                            <span className="flex items-center text-green-600 text-sm font-medium">
-                                                <CreditCard className="h-4 w-4 mr-1" /> Paid
-                                            </span>
+                                        {!isDoctor && (
+                                            apt.paymentStatus === 'PENDING' ? (
+                                                <button
+                                                    onClick={() => handlePay(apt.id)}
+                                                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
+                                                >
+                                                    <CreditCard className="h-4 w-4 mr-2" />
+                                                    Pay Now
+                                                </button>
+                                            ) : (
+                                                <span className="flex items-center text-green-600 text-sm font-medium">
+                                                    <CreditCard className="h-4 w-4 mr-1" /> Paid
+                                                </span>
+                                            )
                                         )}
                                     </div>
                                 </div>

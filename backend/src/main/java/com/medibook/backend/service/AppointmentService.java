@@ -48,4 +48,10 @@ public class AppointmentService {
                 .orElseThrow(() -> new RuntimeException("Patient profile not found"));
         return appointmentRepository.findByPatient_Id(patient.getId());
     }
+
+    public List<Appointment> getAppointmentsByDoctorUser(Long userId) {
+        Doctor doctor = doctorRepository.findByUser_Id(userId)
+                .orElseThrow(() -> new RuntimeException("Doctor profile not found"));
+        return appointmentRepository.findByDoctor_Id(doctor.getId());
+    }
 }

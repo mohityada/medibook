@@ -27,8 +27,14 @@ public class AppointmentController {
     }
 
     @GetMapping("/my-appointments")
-    @PreAuthorize("hasRole('PATIENT')")
+    @PreAuthorize("hasRole('PATIENT') or hasRole('DOCTOR')")
     public List<Appointment> getMyAppointments(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        boolean isDoctor = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_DOCTOR"));
+
+        if (isDoctor) {
+            return appointmentService.getAppointmentsByDoctorUser(userDetails.getId());
+        }
         return appointmentService.getAppointmentsByPatient(userDetails.getId());
     }
 

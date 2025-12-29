@@ -29,6 +29,7 @@ const Doctors = () => {
     const [searchParams] = useSearchParams();
     const query = searchParams.get('query') || '';
     const { user } = useAuth();
+    const [expandedDoctorId, setExpandedDoctorId] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchDoctors = async () => {
@@ -47,29 +48,42 @@ const Doctors = () => {
         fetchDoctors();
     }, [query]);
 
-    const handleBook = async (doctorId: number) => {
+    const generateSlots = () => {
+        const slots = [];
+        const today = new Date();
+        for (let i = 1; i <= 3; i++) {
+            const date = new Date(today);
+            date.setDate(today.getDate() + i);
+            // 3 slots per day for demo
+            const times = [9, 11, 14, 16];
+            times.forEach(hour => {
+                date.setHours(hour, 0, 0, 0);
+                slots.push(new Date(date));
+            });
+        }
+        return slots;
+    };
+
+    const handleBook = async (doctorId: number, timeSlot: Date) => {
         if (!user) {
             alert("Please login to book");
             return;
         }
-        // Simple booking confirmation for MVP
         try {
-            // Find a slot logic would go here. For now, booking a slot tomorrow at 10 AM.
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            tomorrow.setHours(10, 0, 0, 0);
-
             await api.post('/appointments', {
                 doctorId,
-                timeSlot: tomorrow.toISOString()
+                timeSlot: timeSlot.toISOString()
             });
-            alert('Appointment booked successfully for tomorrow 10 AM!');
+            alert(`Appointment booked successfully for ${timeSlot.toLocaleString()}!`);
+            setExpandedDoctorId(null);
         } catch (e: any) {
             alert(e.response?.data?.message || 'Booking failed');
         }
     };
 
     if (loading) return <div className="text-center py-20">Loading doctors...</div>;
+
+    const availableSlots = generateSlots();
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -108,12 +122,35 @@ const Doctors = () => {
                                 </div>
                             </div>
 
-                            <button
-                                onClick={() => handleBook(doctor.id)}
-                                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors font-medium"
-                            >
-                                Book Appointment
-                            </button>
+                            {expandedDoctorId === doctor.id ? (
+                                <div className="animate-in fade-in slide-in-from-top-4 duration-300">
+                                    <p className="font-medium mb-3 text-gray-700">Select a Slot:</p>
+                                    <div className="grid grid-cols-2 gap-2 mb-4">
+                                        {availableSlots.map((slot, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => handleBook(doctor.id, slot)}
+                                                className="text-xs bg-blue-50 text-blue-700 py-2 px-1 rounded hover:bg-blue-100 border border-blue-200"
+                                            >
+                                                {slot.toLocaleDateString()} <br /> {slot.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <button
+                                        onClick={() => setExpandedDoctorId(null)}
+                                        className="w-full text-gray-500 text-sm hover:text-gray-700"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => setExpandedDoctorId(doctor.id)}
+                                    className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors font-medium"
+                                >
+                                    Book Appointment
+                                </button>
+                            )}
                         </div>
                     </div>
                 ))}

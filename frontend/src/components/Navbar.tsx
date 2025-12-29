@@ -35,16 +35,16 @@ const Navbar = () => {
                                 <Link to="/dashboard" className="text-gray-700 hover:text-blue-600 font-medium">
                                     Dashboard
                                 </Link>
-                                <div className="flex items-center text-gray-700">
+                                <Link to="/profile" className="flex items-center hover:text-blue-600">
                                     <User className="h-5 w-5 mr-1" />
                                     <span className="mr-4">{user.email}</span>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="flex items-center text-red-600 hover:text-red-700"
-                                    >
-                                        <LogOut className="h-5 w-5" />
-                                    </button>
-                                </div>
+                                </Link>
+                                <button
+                                    onClick={handleLogout}
+                                    className="flex items-center text-red-600 hover:text-red-700"
+                                >
+                                    <LogOut className="h-5 w-5" />
+                                </button>
                             </div>
                         ) : (
                             <div className="flex items-center space-x-2">
