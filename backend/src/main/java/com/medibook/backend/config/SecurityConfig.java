@@ -60,6 +60,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/auth/**", "/", "/error").permitAll()
                                 .requestMatchers("/api/test/**").permitAll()
+                                .requestMatchers("/api/payment/config").permitAll()
+                                .requestMatchers("/api/doctors", "/api/doctors/search").permitAll()
+                                .requestMatchers("/api/hospitals").permitAll()
+                                .requestMatchers("/api/reviews/doctor/**", "/api/reviews/hospital/**").permitAll()
+                                .requestMatchers("/ws/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .cors(cors -> cors.configurationSource(request -> {

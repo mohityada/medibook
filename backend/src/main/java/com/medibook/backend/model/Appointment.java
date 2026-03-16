@@ -27,16 +27,27 @@ public class Appointment {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
+    @Column(columnDefinition = "TEXT")
+    private String cancellationReason;
+
+    private String stripePaymentIntentId;
+
     public Appointment() {
     }
 
-    public Appointment(Long id, Doctor doctor, Patient patient, LocalDateTime timeSlot, AppointmentStatus status, PaymentStatus paymentStatus) {
+    public Appointment(Long id, Doctor doctor, Patient patient, LocalDateTime timeSlot, AppointmentStatus status, PaymentStatus paymentStatus, String notes, String cancellationReason, String stripePaymentIntentId) {
         this.id = id;
         this.doctor = doctor;
         this.patient = patient;
         this.timeSlot = timeSlot;
         this.status = status;
         this.paymentStatus = paymentStatus;
+        this.notes = notes;
+        this.cancellationReason = cancellationReason;
+        this.stripePaymentIntentId = stripePaymentIntentId;
     }
 
     public static class AppointmentBuilder {
@@ -46,6 +57,9 @@ public class Appointment {
         private LocalDateTime timeSlot;
         private AppointmentStatus status;
         private PaymentStatus paymentStatus;
+        private String notes;
+        private String cancellationReason;
+        private String stripePaymentIntentId;
 
         public AppointmentBuilder id(Long id) { this.id = id; return this; }
         public AppointmentBuilder doctor(Doctor doctor) { this.doctor = doctor; return this; }
@@ -53,9 +67,12 @@ public class Appointment {
         public AppointmentBuilder timeSlot(LocalDateTime timeSlot) { this.timeSlot = timeSlot; return this; }
         public AppointmentBuilder status(AppointmentStatus status) { this.status = status; return this; }
         public AppointmentBuilder paymentStatus(PaymentStatus paymentStatus) { this.paymentStatus = paymentStatus; return this; }
+        public AppointmentBuilder notes(String notes) { this.notes = notes; return this; }
+        public AppointmentBuilder cancellationReason(String cancellationReason) { this.cancellationReason = cancellationReason; return this; }
+        public AppointmentBuilder stripePaymentIntentId(String stripePaymentIntentId) { this.stripePaymentIntentId = stripePaymentIntentId; return this; }
 
         public Appointment build() {
-            return new Appointment(id, doctor, patient, timeSlot, status, paymentStatus);
+            return new Appointment(id, doctor, patient, timeSlot, status, paymentStatus, notes, cancellationReason, stripePaymentIntentId);
         }
     }
 
@@ -80,6 +97,14 @@ public class Appointment {
 
     public PaymentStatus getPaymentStatus() { return paymentStatus; }
     public void setPaymentStatus(PaymentStatus paymentStatus) { this.paymentStatus = paymentStatus; }
-}
 
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+
+    public String getCancellationReason() { return cancellationReason; }
+    public void setCancellationReason(String cancellationReason) { this.cancellationReason = cancellationReason; }
+
+    public String getStripePaymentIntentId() { return stripePaymentIntentId; }
+    public void setStripePaymentIntentId(String stripePaymentIntentId) { this.stripePaymentIntentId = stripePaymentIntentId; }
+}
 
