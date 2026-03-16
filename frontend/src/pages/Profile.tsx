@@ -30,7 +30,6 @@ const Profile = () => {
     
     // Doctor status management
     const [showStatusModal, setShowStatusModal] = useState(false);
-    const [hospitals, setHospitals] = useState<any[]>([]);
 
     const fetchProfile = async () => {
         try {
@@ -47,9 +46,8 @@ const Profile = () => {
         try {
             const response = await api.get('/appointments/my-appointments');
             setAppointments(response.data);
-            if (user.role === 'DOCTOR') {
+            if (user && user.roles.includes('DOCTOR')) {
                 fetchSchedules();
-                fetchHospitals();
             }
         } catch (error) {
             console.error("Failed to fetch appointments", error);
@@ -62,15 +60,6 @@ const Profile = () => {
             setSchedules(response.data);
         } catch (error) {
             console.error('Failed to fetch schedules', error);
-        }
-    };
-
-    const fetchHospitals = async () => {
-        try {
-            const response = await api.get('/hospitals');
-            setHospitals(response.data);
-        } catch (error) {
-            console.error('Failed to fetch hospitals', error);
         }
     };
 
